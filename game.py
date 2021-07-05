@@ -1,3 +1,5 @@
+layout = 'board_layout.txt'  # the text file with the name of each block on the board
+
 class Player:
     """ A data type representing a monopoly player
         with name, position, money, and other relavant 
@@ -34,14 +36,22 @@ def create_board(filename):
     
     return board
 
-def create_players(n):
+def create_players():
     """
-    Creates n players of class type Players
-    Input: 
-            n: int, number of players to create
+    Prompts user for input of number of players to create and creates players
+
     Return: 
       players: list, contain n players 
     """
+    while True:
+        try:
+            n = int(input("PLease enter the number of players: "))
+        except ValueError:              #checks if an int was inputted
+            print("Sorry, please try again")
+            continue
+        else:
+            break
+
     players = []
 
     for i in range(n):
@@ -51,4 +61,3 @@ def create_players(n):
     return players
 
 
-filename = 'board_layout.txt'  # the text file with the name of each block on the board
