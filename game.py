@@ -16,3 +16,25 @@ class Player:
         self.jail = False
         self.jail_roll = 0
         self.properties = []
+
+def create_board(filename):
+    """
+    Takes in a filename that leads to a file that contains what each 
+    block does on a new line for every block.
+
+    Input: filename: txt file containing what each block does
+    Output: list, the gameboard
+    """
+    f = open(filename, 'r')         # read file
+    lines = f.readlines()
+
+    board = []
+    for line in lines:
+        board += [line]
+    
+    return board
+
+
+
+
+filename = 'board_layout.txt'  # the text file with the name of each block on the board
