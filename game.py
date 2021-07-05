@@ -34,7 +34,21 @@ def create_board(filename):
     
     return board
 
+def create_players(n):
+    """
+    Creates n players of class type Players
+    Input: 
+            n: int, number of players to create
+    Return: 
+      players: list, contain n players 
+    """
+    players = []
 
+    for i in range(n):
+        name = input("What is the player name? ")
+        players += [Player(name)]
+    
+    return players
 
 
 filename = 'board_layout.txt'  # the text file with the name of each block on the board
