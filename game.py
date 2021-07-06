@@ -1,3 +1,4 @@
+import random
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
 
 class Player:
@@ -18,6 +19,28 @@ class Player:
         self.jail = False
         self.jail_roll = 0
         self.properties = []
+
+    def dice_roll(self):
+        """
+        Rolls dice and returns the value of the two dices 
+        Return: d1, d2
+        """
+        d1 = random.choice(range(1,7))
+        d2 = random.choice(range(1,7))
+        return d1,d2
+
+    def go_to_jail(self):
+        """
+        Updates players information when they are sent to jail
+        """
+        self.dbl_roll = 0      
+        self.jail = True
+        self.position = 10  
+
+
+
+
+           
 
 def create_board(filename):
     """
@@ -60,4 +83,12 @@ def create_players():
     
     return players
 
-
+def game(filename=layout):
+    """
+    Runs the Monopoly game
+    Input:
+      filename: .txt file, the file the contains the layout of the board
+                    default set to file included (board_layout.txt)
+    """
+    board = create_board(filename)
+    
