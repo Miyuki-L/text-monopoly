@@ -37,7 +37,54 @@ class Player:
         self.jail = True
         self.position = 10  
 
+    def move(self, d1, d2):
+        """
+        updates player position and checks if player's position needs to be 
+        reset because they have reached the end of the board index 39.
+        d1, d2: dice roll outputs
+        """
+        self.position += d1 + d2
 
+        if self.position >= 40:
+            self.position -= 40
+   
+    def player_turn(self, board):
+        """
+        Moves the player for their turn.
+        """
+        d1, d2 = self.dice_roll()
+
+        if self.jail:                           # In jail
+            if self.jail_roll == 3 or d1 == d2: # rolled dbl or in jail for 3 rounds
+                self.jail = False               # Update information
+                self.jail_roll = 0
+
+                self.move(d1, d2)               
+
+                print(self.position, board[self.position])        
+            else:
+                self.jail_roll += 1             # Update information
+                print(self.position, board[self.position])
+
+        else:
+            while d1 == d2:                     # rolled double
+                self.move(d1, d2)               # update information
+                self.dbl_roll += 1
+                print(self.position, board[self.position])
+
+                if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
+                    self.go_to_jail()
+                    print(self.position, board[self.position])
+                else:                           # roll again
+                    d1, d2 = self.dice_roll()
+            
+            self.move(d1, d2)           # update information
+            self.dbl_roll = 0
+            print(self.position, board[self.position])
+
+            if self.position == 30:        # landed on go to jail
+                self.go_to_jail()
+                print(self.position, board[self.position])
 
 
            
