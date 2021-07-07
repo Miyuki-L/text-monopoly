@@ -48,9 +48,22 @@ class Player:
         if self.position >= 40:
             self.position -= 40
    
+    def print_position(self,board):
+        """
+        Prints the block that landed on or is currently at 
+        Input: board: the game board
+        """
+
+        if self.jail:                 # Player is in jail right now
+            print(self.name, ' you are currently in Jail')
+        else:
+            print(self.name, 'you have landed on', board[self.position])
+
+
     def player_turn(self, board):
         """
         Moves the player for their turn.
+        Input: board: the game board
         """
         d1, d2 = self.dice_roll()
 
@@ -61,30 +74,35 @@ class Player:
 
                 self.move(d1, d2)               
 
-                print(self.position, board[self.position])        
+                self.print_position(board)        
             else:
                 self.jail_roll += 1             # Update information
-                print(self.position, board[self.position])
+
+                self.print_position(board)
 
         else:
             while d1 == d2:                     # rolled double
                 self.move(d1, d2)               # update information
                 self.dbl_roll += 1
-                print(self.position, board[self.position])
+
+                self.print_position(board)
 
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
                     self.go_to_jail()
-                    print(self.position, board[self.position])
+
+                    self.print_position(board)
                 else:                           # roll again
                     d1, d2 = self.dice_roll()
             
             self.move(d1, d2)           # update information
             self.dbl_roll = 0
-            print(self.position, board[self.position])
+
+            self.print_position(board)
 
             if self.position == 30:        # landed on go to jail
                 self.go_to_jail()
-                print(self.position, board[self.position])
+                
+                self.print_position(board)
 
 
            
