@@ -35,7 +35,7 @@ class Player:
         """
         Updates players information when they are sent to jail
         """
-        print(self.name, "going to jail")
+        print(self.name, "going to jail\n")
         
         self.dbl_roll = 0      
         self.jail = True
@@ -93,7 +93,7 @@ class Player:
                 self.print_position(board)
 
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
-                    print('Rolled 3 consecutive doubles')
+                    print('Rolled 3 consecutive doubles\n')
                     self.go_to_jail()
 
                 elif self.position == 30:       # Landed on go to jail
