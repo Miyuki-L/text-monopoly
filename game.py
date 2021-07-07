@@ -1,4 +1,6 @@
 import random
+from time import sleep
+
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
 
 class Player:
@@ -57,7 +59,7 @@ class Player:
         """
 
         if self.jail:                 # Player is in jail right now
-            print(self.name, 'are currently in Jail')
+            print(self.name, 'is currently in Jail\n')
         else:
             print(self.name, 'landed on', board[self.position])
 
@@ -95,7 +97,6 @@ class Player:
                     self.go_to_jail()
 
                 elif self.position == 30:       # Landed on go to jail
-                    self.print_position(board)
                     self.go_to_jail()
 
                 else:                           # roll again
@@ -108,7 +109,6 @@ class Player:
             self.print_position(board)
 
             if self.position == 30:        # landed on go to jail
-                self.print_position(board)
                 self.go_to_jail()
                 
                 
@@ -169,6 +169,14 @@ def game(filename=layout):
     board = create_board(filename)                  # setup
     players = create_players()
 
-    for player in players:
-        player.player_turn(board)
+    p_index = 0
+    while True:
+        current_p = players[p_index]
+        current_p.player_turn(board)
+        sleep(1)
+
+        p_index += 1                                # next player
+        if p_index == len(players):                 # reset p_index
+            p_index = 0 
+
     
