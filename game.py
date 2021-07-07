@@ -33,6 +33,8 @@ class Player:
         """
         Updates players information when they are sent to jail
         """
+        print(self.name, "going to jail")
+        
         self.dbl_roll = 0      
         self.jail = True
         self.position = 10  
@@ -57,8 +59,7 @@ class Player:
         if self.jail:                 # Player is in jail right now
             print(self.name, 'are currently in Jail')
         else:
-            print(self.name, 'have landed on', board[self.position])
-
+            print(self.name, 'landed on', board[self.position])
 
     def player_turn(self, board):
         """
@@ -75,7 +76,8 @@ class Player:
 
                 self.move(d1, d2)               
 
-                self.print_position(board)        
+                self.print_position(board) 
+                       
             else:
                 self.jail_roll += 1             # Update information
 
@@ -89,9 +91,13 @@ class Player:
                 self.print_position(board)
 
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
+                    print('Rolled 3 consecutive doubles')
                     self.go_to_jail()
 
+                elif self.position == 30:       # Landed on go to jail
                     self.print_position(board)
+                    self.go_to_jail()
+
                 else:                           # roll again
                     d1, d2 = self.dice_roll()
                     print(self.name, 'rolled:', d1, d2)
@@ -102,9 +108,10 @@ class Player:
             self.print_position(board)
 
             if self.position == 30:        # landed on go to jail
+                self.print_position(board)
                 self.go_to_jail()
                 
-                self.print_position(board)
+                
 
 
            
@@ -136,6 +143,7 @@ def create_players():
     while True:
         try:
             n = int(input("PLease enter the number of players: "))
+            print()
         except ValueError:              #checks if an int was inputted
             print("Sorry, please try again")
             continue
@@ -146,6 +154,7 @@ def create_players():
 
     for i in range(n):
         name = input("What is the player name? ")
+        print()
         players += [Player(name)]
     
     return players
@@ -157,5 +166,9 @@ def game(filename=layout):
       filename: .txt file, the file the contains the layout of the board
                     default set to file included (board_layout.txt)
     """
-    board = create_board(filename)
+    board = create_board(filename)                  # setup
+    players = create_players()
+
+    for player in players:
+        player.player_turn(board)
     
