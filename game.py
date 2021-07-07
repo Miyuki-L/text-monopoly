@@ -55,9 +55,9 @@ class Player:
         """
 
         if self.jail:                 # Player is in jail right now
-            print(self.name, ' you are currently in Jail')
+            print(self.name, 'are currently in Jail')
         else:
-            print(self.name, 'you have landed on', board[self.position])
+            print(self.name, 'have landed on', board[self.position])
 
 
     def player_turn(self, board):
@@ -66,7 +66,8 @@ class Player:
         Input: board: the game board
         """
         d1, d2 = self.dice_roll()
-
+        print(self.name, 'rolled:', d1, d2)
+        
         if self.jail:                           # In jail
             if self.jail_roll == 3 or d1 == d2: # rolled dbl or in jail for 3 rounds
                 self.jail = False               # Update information
@@ -93,6 +94,7 @@ class Player:
                     self.print_position(board)
                 else:                           # roll again
                     d1, d2 = self.dice_roll()
+                    print(self.name, 'rolled:', d1, d2)
             
             self.move(d1, d2)           # update information
             self.dbl_roll = 0
