@@ -167,6 +167,17 @@ class Land:
         self.houses = 0
         self.owner = ''             #no one owns this property yet
 
+    def cal_rent(self):
+        """
+        Calculates the Rent that a player needs to pay for this property
+        if they land on it.
+
+        return int, amount of rent to pay
+        """
+
+        houses = self.houses
+        rent = self.rent[str(houses)]
+        return rent
 
 class Railroad:
     """
@@ -188,7 +199,17 @@ class Railroad:
         self.mortgage = description['mortgage']
         self.owner = ''             #no one owns this property yet
 
+    def cal_rent(self):
+        """
+        Calculates the Rent that a player needs to pay for this property
+        if they land on it.
 
+        return int, amount of rent to pay
+        """
+        owner = self.owner
+        num_owned = len(owner.railroad)
+        rent = self.rent[str(num_owned)]
+        return rent
 
 class Utilities:
     """
@@ -209,6 +230,18 @@ class Utilities:
         self.rent = description['rent']
         self.mortgage = description['mortgage']
         self.owner = ''             #no one owns this property yet
+
+    def cal_rent(self):
+        """
+        Finds the amount to times the dice roll by when a player lands on
+        this property
+
+        return int, amount to multiply by
+        """
+        owner = self.owner
+        num_owned = len(owner.utilities)
+        rent = self.rent[str(num_owned)]
+        return rent
 
 
 class Taxes:
