@@ -59,11 +59,14 @@ class Player:
         Prints the block that landed on or is currently at 
         Input: board: the game board
         """
+        block = board[self.position]
 
         if self.jail:                 # Player is in jail right now
             print(self.name, 'is currently in Jail\n')
+        elif type(block) != str:      # landed on properties
+            print(self.name, 'landed on', block.name,"\n")
         else:
-            print(self.name, 'landed on', board[self.position])
+            print(self.name, 'landed on', board[self.position],"\n")
 
     def player_turn(self, board):
         """
@@ -114,7 +117,26 @@ class Player:
                 self.go_to_jail()
                 
 
+class Land:
+    """
+    Data Type representing Land in monopoly (those where the player could build
+    houses). Contains the information of price, upgradeCost, colorset, rent and
+    other relavant information
+    """
 
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.upgradeCost = description['upgradeCost']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+        self.colorSet = description['colorSet']
 
 def read_json(filename):
     """
@@ -128,7 +150,7 @@ def read_json(filename):
 
     return property_dict
 
-def create_board(filename):
+def create_board(f_layout, f_json):
     """
     Takes in a filename that leads to a file that contains what each 
     block does on a new line for every block.
@@ -136,12 +158,25 @@ def create_board(filename):
     Input: filename: txt file containing what each block does
     Output: list, the gameboard
     """
-    f = open(filename, 'r')         # read file
+    json_dict = read_json(f_json)
+
+    f = open(f_layout, 'r')         # read layout file
     lines = f.readlines()
 
     board = []
     for line in lines:
-        board += [line[:-1]]         # get rid of \n at end of the line
+        name = line[:-1]           # get rid of \n at end of the line
+        try:
+            info = json_dict[name]
+
+        except KeyError:            # Not Land, utility or tax
+            board += [name]
+
+        else:                       # Land, utility or tax
+            if info['type'] == "land":
+                board += [Land(name, info)]
+            else:
+                board += [name]       
     
     return board
 
@@ -171,14 +206,14 @@ def create_players():
     
     return players
 
-def game(filename=layout):
+def game(f_layout=layout, f_json=description):
     """
     Runs the Monopoly game
     Input:
       filename: .txt file, the file the contains the layout of the board
                     default set to file included (board_layout.txt)
     """
-    board = create_board(filename)                  # setup
+    board = create_board(f_layout, f_json)                  # setup
     players = create_players()
 
     p_index = 0
