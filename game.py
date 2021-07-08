@@ -20,9 +20,13 @@ class Player:
         self.position = 0
         self.money = 1500
         self.dbl_roll = 0
+        
         self.jail = False
         self.jail_roll = 0
-        self.properties = []
+
+        self.land = []
+        self.railroad = []
+        self.utilities = []
 
     def dice_roll(self):
         """
@@ -160,6 +164,8 @@ class Land:
         self.rent = description['rent']
         self.mortgage = description['mortgage']
         self.colorSet = description['colorSet']
+        self.houses = 0
+        self.owner = ''             #no one owns this property yet
 
 
 class Railroad:
@@ -180,6 +186,8 @@ class Railroad:
         self.price = description['price']
         self.rent = description['rent']
         self.mortgage = description['mortgage']
+        self.owner = ''             #no one owns this property yet
+
 
 
 class Utilities:
@@ -200,6 +208,7 @@ class Utilities:
         self.price = description['price']
         self.rent = description['rent']
         self.mortgage = description['mortgage']
+        self.owner = ''             #no one owns this property yet
 
 
 class Taxes:
