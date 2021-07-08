@@ -1,7 +1,9 @@
 import random
+import json
 from time import sleep
 
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
+description = "properties_tax.json" # file containing information aobut land, utilities, tax
 
 class Player:
     """ A data type representing a monopoly player
@@ -111,10 +113,20 @@ class Player:
             if self.position == 30:        # landed on go to jail
                 self.go_to_jail()
                 
-                
 
 
-           
+
+def read_json(filename):
+    """
+    Takes in filename of json file that has the properties description 
+    for the monopoly and reads in the json
+    
+    return: property_dict, dict
+    """
+    with open(filename) as f:
+        property_dict = json.load(f)
+
+    return property_dict
 
 def create_board(filename):
     """
@@ -129,7 +141,7 @@ def create_board(filename):
 
     board = []
     for line in lines:
-        board += [line]
+        board += [line[:-1]]         # get rid of \n at end of the line
     
     return board
 
