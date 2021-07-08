@@ -161,6 +161,65 @@ class Land:
         self.mortgage = description['mortgage']
         self.colorSet = description['colorSet']
 
+
+class Railroad:
+    """
+    Data Type representing Railroad in monopoly (Electric company/Water works). 
+    Contains the information of price, rent and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+
+
+class Utilities:
+    """
+    Data Type representing Utilities in monopoly (Electric company/Water works). 
+    Contains the information of price, rent and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+
+
+class Taxes:
+    """
+    Data Type representing Taxes in monopoly (Income/Luxury Tax). 
+    Contains the information of price and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+
+
 def read_json(filename):
     """
     Takes in filename of json file that has the properties description 
@@ -196,10 +255,14 @@ def create_board(f_layout, f_json):
             board += [name]
 
         else:                       # Land, utility or tax
-            if info['type'] == "land":
+            if info['type'] == "land":              # land
                 board += [Land(name, info)]
-            else:
-                board += [name]       
+            elif info['type'] == 'utilities':       # Utilities
+                board += [Utilities(name,info)]
+            elif info['type'] == 'railroad':        # Railroad
+                board += [Railroad(name,info)]
+            else:                                   # Tax
+                board += [Taxes(name,info)]       
     
     return board
 
