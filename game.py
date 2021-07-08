@@ -68,6 +68,22 @@ class Player:
         else:
             print(self.name, 'landed on', board[self.position],"\n")
 
+    def post_jail(self):
+        """
+        Moves the player when they leave the jail
+        This is a separate function because rules are slightly different
+            (Players do not get to roll again when they rolled a double)
+        """
+        self.jail = False               # Update information
+        self.jail_roll = 0
+
+        print(self.name, 'leaving jail \n')
+
+        d1, d2 = self.dice_roll()       # roll again (this time for moving)
+        print(self.name, 'rolled:', d1, d2)
+
+        self.move(d1, d2)               
+
     def player_turn(self, board):
         """
         Moves the player for their turn.
@@ -77,13 +93,17 @@ class Player:
         print(self.name, 'rolled:', d1, d2)
         
         if self.jail:                           # In jail
-            if self.jail_roll == 3 or d1 == d2: # rolled dbl or in jail for 3 rounds
-                self.jail = False               # Update information
-                self.jail_roll = 0
+            if self.jail_roll == 3:             # in jail for 3 rounds
+                print(self.name, 'end of third turn in jail')
 
-                self.move(d1, d2)               
-
+                self.post_jail()                             
                 self.print_position(board) 
+
+            elif d1 == d2:                      # rolled a double
+                print(self.name, 'rolled a double while in jail')
+
+                self.post_jail()
+                self.print_position(board)
                        
             else:
                 self.jail_roll += 1             # Update information
@@ -100,9 +120,11 @@ class Player:
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
                     print('Rolled 3 consecutive doubles\n')
                     self.go_to_jail()
+                    return                      # end turn
 
                 elif self.position == 30:       # Landed on go to jail
                     self.go_to_jail()
+                    return                      # end turn
 
                 else:                           # roll again
                     d1, d2 = self.dice_roll()
@@ -115,6 +137,7 @@ class Player:
 
             if self.position == 30:        # landed on go to jail
                 self.go_to_jail()
+                return                     # end turn
                 
 
 class Land:
