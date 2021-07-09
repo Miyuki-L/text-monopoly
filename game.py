@@ -246,8 +246,6 @@ class Player:
 
         Input: block, class Land
         """
-
-
         if block.houses == 'hotel':
             print(f"No upgrades avaliable for {block.name}\n")
             return
@@ -266,8 +264,8 @@ class Player:
             decision = input(f"\n{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                       # buy
-
             block.houses += 1 
+
             if block.houses == 5:
                 block.houses = 'hotel'
                 print(f"\n{self.name} upgraded {block.name} to a hotel")
@@ -277,7 +275,6 @@ class Player:
             self.money -= block.upgradeCost
 
             print(f"{self.name}: You have ${self.money}\n")
-
 
     def check_block(self, block):
         """
@@ -322,7 +319,6 @@ class Player:
                 owner = block.owner
 
                 if owner.name != self.name: # pay
-                    d1, d2 = self.dice_roll()
                     rent = block.cal_rent()
                     
                     self.money -= rent
