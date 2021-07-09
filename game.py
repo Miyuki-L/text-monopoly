@@ -154,6 +154,9 @@ class Player:
         """
         d1 = random.choice(range(1,7))
         d2 = random.choice(range(1,7))
+        
+        print(self.name, 'rolled:', d1, d2)
+        
         return d1,d2
 
     def go_to_jail(self):
@@ -207,13 +210,16 @@ class Player:
 
         self.move(d1, d2)               
 
+
+       
+
     def player_turn(self, board):
         """
         Moves the player for their turn.
         Input: board: the game board
         """
         d1, d2 = self.dice_roll()
-        print(self.name, 'rolled:', d1, d2)
+        
         
         if self.jail:                           # In jail
             if self.jail_roll == 3:             # in jail for 3 rounds
@@ -253,7 +259,7 @@ class Player:
 
                 else:                           # roll again
                     d1, d2 = self.dice_roll()
-                    print(self.name, 'rolled:', d1, d2)
+
             
             self.move(d1, d2)           # update information
             self.dbl_roll = 0
