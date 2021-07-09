@@ -103,8 +103,8 @@ class Utilities:
         """
         owner = self.owner
         num_owned = len(owner.utilities)
-        rent = self.rent[str(num_owned)]
-        return rent
+        mult = self.rent[str(num_owned)]
+        return mult
 
 
 class Taxes:
@@ -210,8 +210,132 @@ class Player:
 
         self.move(d1, d2)               
 
+    def buy(self, block):
+        """
+        Prompts the user and askes if they want to buy the block they 
+        landed on.
+        If yes, conduct the transcation
 
-       
+        Input: block, Land (class)
+        """
+        print(f"{self.name}: You have ${self.money}")
+        decision = input(f"\n{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
+
+        while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
+            print(f"{self.name}: You have ${self.money}")
+            decision = input(f"\n{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
+
+        if decision.lower() in ['y','yes']:                       # buy
+            print(f"{self.name} bought {block.name}")
+            print(f"{self.name}: You have ${self.money}")
+
+            self.money -= block.price                           # update information
+            block.owner = self.name
+
+            if type(block) == Land:
+                self.land += [block]
+            elif type(block) == Utilities:
+                self.utilities += [block]
+            elif type(block) == Railroad:
+                self.railroad += [block]
+
+    def upgrade(self, block):
+        """
+        Checks if an upgrade is avaliable if so
+        Asks the owner of the block if they want to upgrade their property
+
+        Input: block, class Land
+        """
+
+
+        if block.houses == 'hotel':
+            print(f"No upgrades avaliable for {block.name}\n")
+            return
+
+        print(f"{self.name}: You have ${self.money}")
+        print(f"{block.name} has {block.houses} houses and the current rent is {block.cal_rent()}")
+        if block.houses == 4:
+            print(f"If you upgrade to hotel the rent would be {block.rent['hotel']}")
+        else:
+            print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}")
+
+
+        decision = input(f"\n{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
+
+        while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
+            decision = input(f"\n{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
+
+        if decision.lower() in ['y','yes']:                       # buy
+
+            block.houses += 1 
+            if block.houses == 5:
+                block.houses = 'hotel'
+                print(f"\n{self.name} upgraded {block.name} to a hotel")
+            else:
+                print(f"\n{self.name} upgraded {block.name} to {block.houses} houses")
+
+            self.money -= block.upgradeCost
+
+            print(f"{self.name}: You have ${self.money}\n")
+
+
+    def check_block(self, block):
+        """
+        Checks the Block that the player is currently on
+        See if they could 1) buy the block, 2) upgrade the block, 3) pay
+        
+        Input: block: the block on the board the player is currently on
+        """
+
+        if type(block) == Land:                 
+            if block.owner != '':               # Someone owns the land
+                owner = block.owner
+
+                if owner.name != self.name:     # pay
+                    rent = block.cal_rent()
+                    self.money -= rent
+                    owner.money += rent
+
+                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                    print(f"{self.name}: You have ${self.money}")
+                else:                           # upgrade?
+                   self.upgrade(block) 
+            else:                               # buy?
+                self.buy(block)
+
+        elif type(block) == Utilities:
+            if block.owner != '':
+                owner = block.owner
+
+                if owner.name != self.name: # pay
+                    d1, d2 = self.dice_roll()
+                    mult = block.cal_rent()
+                    rent = mult * (d1 + d2)
+
+                    self.money -= rent
+                    owner.money += rent
+            else:
+                self.buy(block)   #buy
+        
+        elif type(block) == Railroad:
+            if block.owner != '':
+                owner = block.owner
+
+                if owner.name != self.name: # pay
+                    d1, d2 = self.dice_roll()
+                    rent = block.cal_rent()
+                    
+                    self.money -= rent
+                    owner.money += rent
+            else:
+                self.buy(block)   #buy
+        
+        elif type(block) == Taxes:
+            tax = block.price
+            self.money -= tax
+
+            print(f"{self.name} payed ${tax} of {block.name}")
+            print(f"{self.name}: You have ${self.money}")       
 
     def player_turn(self, board):
         """
