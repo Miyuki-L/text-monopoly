@@ -5,6 +5,125 @@ from time import sleep
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
 description = "properties_tax.json" # file containing information aobut land, utilities, tax
 
+class Land:
+    """
+    Data Type representing Land in monopoly (those where the player could build
+    houses). Contains the information of price, upgradeCost, colorset, rent and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.upgradeCost = description['upgradeCost']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+        self.colorSet = description['colorSet']
+        self.houses = 0
+        self.owner = ''             #no one owns this property yet
+
+    def cal_rent(self):
+        """
+        Calculates the Rent that a player needs to pay for this property
+        if they land on it.
+
+        return int, amount of rent to pay
+        """
+
+        houses = self.houses
+        rent = self.rent[str(houses)]
+        return rent
+
+
+class Railroad:
+    """
+    Data Type representing Railroad in monopoly (Electric company/Water works). 
+    Contains the information of price, rent and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+        self.owner = ''             #Class Player
+
+    def cal_rent(self):
+        """
+        Calculates the Rent that a player needs to pay for this property
+        if they land on it.
+
+        return int, amount of rent to pay
+        """
+        owner = self.owner
+        num_owned = len(owner.railroad)
+        rent = self.rent[str(num_owned)]
+        return rent
+
+
+class Utilities:
+    """
+    Data Type representing Utilities in monopoly (Electric company/Water works). 
+    Contains the information of price, rent and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, rent, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+        self.rent = description['rent']
+        self.mortgage = description['mortgage']
+        self.owner = ''             #no one owns this property yet
+
+    def cal_rent(self):
+        """
+        Finds the amount to times the dice roll by when a player lands on
+        this property
+
+        return int, amount to multiply by
+        """
+        owner = self.owner
+        num_owned = len(owner.utilities)
+        rent = self.rent[str(num_owned)]
+        return rent
+
+
+class Taxes:
+    """
+    Data Type representing Taxes in monopoly (Income/Luxury Tax). 
+    Contains the information of price and
+    other relavant information
+    """
+
+    def __init__(self, name, description):
+        """
+        Construct object of type Class with the given name and description
+        uses the description to get the information about price, ...
+        Attributes: 
+        """
+        self.name = name
+        self.location = description['location']
+        self.price = description['price']
+
 class Player:
     """ A data type representing a monopoly player
         with name, position, money, and other relavant 
@@ -118,6 +237,8 @@ class Player:
             while d1 == d2:                     # rolled double
                 self.move(d1, d2)               # update information
                 self.dbl_roll += 1
+                
+                self.check_block(board[self.position])  # Looks at the checks if they could buy or have to pay
 
                 self.print_position(board)
 
@@ -142,125 +263,7 @@ class Player:
             if self.position == 30:        # landed on go to jail
                 self.go_to_jail()
                 return                     # end turn
-                
-
-class Land:
-    """
-    Data Type representing Land in monopoly (those where the player could build
-    houses). Contains the information of price, upgradeCost, colorset, rent and
-    other relavant information
-    """
-
-    def __init__(self, name, description):
-        """
-        Construct object of type Class with the given name and description
-        uses the description to get the information about price, rent, ...
-        Attributes: 
-        """
-        self.name = name
-        self.location = description['location']
-        self.price = description['price']
-        self.upgradeCost = description['upgradeCost']
-        self.rent = description['rent']
-        self.mortgage = description['mortgage']
-        self.colorSet = description['colorSet']
-        self.houses = 0
-        self.owner = ''             #no one owns this property yet
-
-    def cal_rent(self):
-        """
-        Calculates the Rent that a player needs to pay for this property
-        if they land on it.
-
-        return int, amount of rent to pay
-        """
-
-        houses = self.houses
-        rent = self.rent[str(houses)]
-        return rent
-
-class Railroad:
-    """
-    Data Type representing Railroad in monopoly (Electric company/Water works). 
-    Contains the information of price, rent and
-    other relavant information
-    """
-
-    def __init__(self, name, description):
-        """
-        Construct object of type Class with the given name and description
-        uses the description to get the information about price, rent, ...
-        Attributes: 
-        """
-        self.name = name
-        self.location = description['location']
-        self.price = description['price']
-        self.rent = description['rent']
-        self.mortgage = description['mortgage']
-        self.owner = ''             #no one owns this property yet
-
-    def cal_rent(self):
-        """
-        Calculates the Rent that a player needs to pay for this property
-        if they land on it.
-
-        return int, amount of rent to pay
-        """
-        owner = self.owner
-        num_owned = len(owner.railroad)
-        rent = self.rent[str(num_owned)]
-        return rent
-
-class Utilities:
-    """
-    Data Type representing Utilities in monopoly (Electric company/Water works). 
-    Contains the information of price, rent and
-    other relavant information
-    """
-
-    def __init__(self, name, description):
-        """
-        Construct object of type Class with the given name and description
-        uses the description to get the information about price, rent, ...
-        Attributes: 
-        """
-        self.name = name
-        self.location = description['location']
-        self.price = description['price']
-        self.rent = description['rent']
-        self.mortgage = description['mortgage']
-        self.owner = ''             #no one owns this property yet
-
-    def cal_rent(self):
-        """
-        Finds the amount to times the dice roll by when a player lands on
-        this property
-
-        return int, amount to multiply by
-        """
-        owner = self.owner
-        num_owned = len(owner.utilities)
-        rent = self.rent[str(num_owned)]
-        return rent
-
-
-class Taxes:
-    """
-    Data Type representing Taxes in monopoly (Income/Luxury Tax). 
-    Contains the information of price and
-    other relavant information
-    """
-
-    def __init__(self, name, description):
-        """
-        Construct object of type Class with the given name and description
-        uses the description to get the information about price, ...
-        Attributes: 
-        """
-        self.name = name
-        self.location = description['location']
-        self.price = description['price']
-
+         
 
 def read_json(filename):
     """
