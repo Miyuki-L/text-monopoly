@@ -180,6 +180,7 @@ class Player:
         if self.position >= 40:
             self.position -= 40
             print(f"{self.name} passed Go and collected $200.")
+            self.money += 200
    
     def print_position(self,board):
         """
@@ -317,6 +318,9 @@ class Player:
 
                     self.money -= rent
                     owner.money += rent
+
+                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                    print(f"{self.name}: You have ${self.money}\n")
             else:
                 self.buy(block)   #buy
         
@@ -329,6 +333,9 @@ class Player:
                     
                     self.money -= rent
                     owner.money += rent
+
+                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                    print(f"{self.name}: You have ${self.money}\n")
             else:
                 self.buy(block)   #buy
         
@@ -490,4 +497,5 @@ def game(f_layout=layout, f_json=description):
         if p_index == len(players):                 # reset p_index
             p_index = 0 
 
-    
+
+            
