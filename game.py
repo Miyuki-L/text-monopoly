@@ -344,6 +344,8 @@ class Player:
         
         
         if self.jail:                           # In jail
+            self.jail_roll += 1
+            
             if self.jail_roll == 3:             # in jail for 3 rounds
                 print(self.name, 'end of third turn in jail')
 
@@ -357,8 +359,6 @@ class Player:
                 self.print_position(board)
                        
             else:
-                self.jail_roll += 1             # Update information
-
                 self.print_position(board)
 
         else:
