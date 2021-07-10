@@ -227,7 +227,7 @@ class Player:
 
         if decision.lower() in ['y','yes']:                       # buy
             self.money -= block.price                           # update information
-            block.owner = self.name
+            block.owner = self
             
             print(f"{self.name} bought {block.name}")
             print(f"{self.name}: You have ${self.money}\n")
@@ -239,6 +239,8 @@ class Player:
                 self.utilities += [block]
             elif type(block) == Railroad:
                 self.railroad += [block]
+        else:
+            print()
 
     def upgrade(self, block):
         """
@@ -277,6 +279,8 @@ class Player:
             self.money -= block.upgradeCost
 
             print(f"{self.name}: You have ${self.money}\n")
+        else:
+            print()
 
     def check_block(self, block):
         """
@@ -296,7 +300,7 @@ class Player:
                     owner.money += rent
 
                     print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                    print(f"{self.name}: You have ${self.money}")
+                    print(f"{self.name}: You have ${self.money}\n")
                 else:                           # upgrade?
                    self.upgrade(block) 
             else:                               # buy?
@@ -333,7 +337,7 @@ class Player:
             self.money -= tax
 
             print(f"{self.name} payed ${tax} of {block.name}")
-            print(f"{self.name}: You have ${self.money}")       
+            print(f"{self.name}: You have ${self.money}\n")       
 
     def player_turn(self, board):
         """
