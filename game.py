@@ -296,12 +296,15 @@ class Player:
                 owner = block.owner
 
                 if owner.name != self.name:     # pay
-                    rent = block.cal_rent()
-                    self.money -= rent
-                    owner.money += rent
+                    if not owner.jail:
+                        rent = block.cal_rent()
+                        self.money -= rent
+                        owner.money += rent
 
-                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                    print(f"{self.name}: You have ${self.money}\n")
+                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                        print(f"{self.name}: You have ${self.money}\n")
+                    else:
+                        print(f"{owner.name} is in jail. No rent is payed.\n")
                 else:                           # upgrade?
                    self.upgrade(block) 
             else:                               # buy?
@@ -311,16 +314,19 @@ class Player:
             if block.owner != '':
                 owner = block.owner
 
-                if owner.name != self.name: # pay
-                    d1, d2 = self.dice_roll()
-                    mult = block.cal_rent()
-                    rent = mult * (d1 + d2)
+                if owner.name != self.name: # pay?
+                    if not owner.jail: 
+                        d1, d2 = self.dice_roll()
+                        mult = block.cal_rent()
+                        rent = mult * (d1 + d2)
 
-                    self.money -= rent
-                    owner.money += rent
+                        self.money -= rent
+                        owner.money += rent
 
-                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                    print(f"{self.name}: You have ${self.money}\n")
+                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
+                        print(f"{self.name}: You have ${self.money}.\n")
+                    else:
+                        print(f"{owner.name} is in jail. No rent is payed.\n")
             else:
                 self.buy(block)   #buy
         
@@ -328,14 +334,17 @@ class Player:
             if block.owner != '':
                 owner = block.owner
 
-                if owner.name != self.name: # pay
-                    rent = block.cal_rent()
-                    
-                    self.money -= rent
-                    owner.money += rent
+                if owner.name != self.name: # pay?
+                    if not owner.jail: 
+                        rent = block.cal_rent()
+                        
+                        self.money -= rent
+                        owner.money += rent
 
-                    print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                    print(f"{self.name}: You have ${self.money}\n")
+                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                        print(f"{self.name}: You have ${self.money}\n")
+                    else:
+                        print(f"{owner.name} is in jail. No rent is payed.\n")
             else:
                 self.buy(block)   #buy
         
