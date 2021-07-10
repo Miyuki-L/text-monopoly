@@ -179,6 +179,7 @@ class Player:
 
         if self.position >= 40:
             self.position -= 40
+            print(f"{self.name} passed Go and collected $200.")
    
     def print_position(self,board):
         """
