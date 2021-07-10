@@ -219,18 +219,19 @@ class Player:
         Input: block, Land (class)
         """
         print(f"{self.name}: You have ${self.money}")
-        decision = input(f"\n{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
+        decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
 
         while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
-            print(f"{self.name}: You have ${self.money}")
-            decision = input(f"\n{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
+            print(f"\n{self.name}: You have ${self.money}")
+            decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                       # buy
-            print(f"{self.name} bought {block.name}")
-            print(f"{self.name}: You have ${self.money}")
-
             self.money -= block.price                           # update information
             block.owner = self.name
+            
+            print(f"{self.name} bought {block.name}")
+            print(f"{self.name}: You have ${self.money}\n")
+
 
             if type(block) == Land:
                 self.land += [block]
@@ -258,10 +259,11 @@ class Player:
             print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}")
 
 
-        decision = input(f"\n{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
+        decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
-            decision = input(f"\n{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
+            print(f"\n{self.name}: You have ${self.money}")
+            decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                       # buy
             block.houses += 1 
@@ -363,8 +365,6 @@ class Player:
             while d1 == d2:                     # rolled double
                 self.move(d1, d2)               # update information
                 self.dbl_roll += 1
-                
-                self.check_block(board[self.position])  # Looks at the checks if they could buy or have to pay
 
                 self.print_position(board)
 
@@ -377,7 +377,8 @@ class Player:
                     self.go_to_jail()
                     return                      # end turn
 
-                else:                           # roll again
+                else:                           # check block & roll again
+                    self.check_block(board[self.position])  # Looks at the checks if they could buy or have to pay
                     d1, d2 = self.dice_roll()
 
             
@@ -389,6 +390,8 @@ class Player:
             if self.position == 30:        # landed on go to jail
                 self.go_to_jail()
                 return                     # end turn
+
+            self.check_block(board[self.position])
          
 
 def read_json(filename):
