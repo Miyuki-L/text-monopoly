@@ -207,7 +207,6 @@ class Player:
         print(self.name, 'leaving jail \n')
 
         d1, d2 = self.dice_roll()       # roll again (this time for moving)
-        print(self.name, 'rolled:', d1, d2)
 
         self.move(d1, d2)               
 
@@ -255,9 +254,9 @@ class Player:
             return
 
         print(f"{self.name}: You have ${self.money}")
-        print(f"{block.name} has {block.houses} houses and the current rent is {block.cal_rent()}")
+        print(f"{block.name} has {block.houses} houses and the current rent is ${block.cal_rent()}")
         if block.houses == 4:
-            print(f"If you upgrade to hotel the rent would be {block.rent['hotel']}")
+            print(f"If you upgrade to hotel the rent would be ${block.rent['hotel']}")
         else:
             print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}")
 
