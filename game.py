@@ -147,6 +147,9 @@ class Player:
         self.railroad = []
         self.utilities = []
 
+        self.bankrupt = False
+        self.mortgage = []
+
     def dice_roll(self):
         """
         Rolls dice and returns the value of the two dices 
@@ -283,6 +286,32 @@ class Player:
         else:
             print()
 
+    def rent(self, block):
+        """
+        checks the block that the player is on and see if they need to pay rent
+            no rent if 1) their own block, 2) owner in jail or 3) property under mortgage
+        """
+        owner = block.owner
+
+        if not owner.jail:                
+            if not (block in owner.mortgage):        # property not under mortgage
+                if type(block) in [Land, Railroad]:     # Land & Railroad have same method of rent calculation
+                    rent = block.cal_rent()
+                elif type(block) == Utilities:
+                    d1, d2 = self.dice_roll()
+                    mult = block.cal_rent()
+                    rent = mult * (d1 + d2)
+
+                self.money -= rent
+                owner.money += rent
+
+                print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
+                print(f"{self.name}: You have ${self.money}\n")
+            else:                                       # property played under mortgage
+                print(f"{block.name} is under mortgage. No rent is payed. \n")
+        else:                                           # owner in jail
+            print(f"{owner.name} is in jail. No rent is payed.\n")
+
     def check_block(self, block):
         """
         Checks the Block that the player is currently on
@@ -295,16 +324,8 @@ class Player:
             if block.owner != '':               # Someone owns the land
                 owner = block.owner
 
-                if owner.name != self.name:     # pay
-                    if not owner.jail:
-                        rent = block.cal_rent()
-                        self.money -= rent
-                        owner.money += rent
-
-                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                        print(f"{self.name}: You have ${self.money}\n")
-                    else:
-                        print(f"{owner.name} is in jail. No rent is payed.\n")
+                if owner.name != self.name:     # pay rent?
+                    self.rent(block)
                 else:                           # upgrade?
                    self.upgrade(block) 
             else:                               # buy?
@@ -314,39 +335,19 @@ class Player:
             if block.owner != '':
                 owner = block.owner
 
-                if owner.name != self.name: # pay?
-                    if not owner.jail: 
-                        d1, d2 = self.dice_roll()
-                        mult = block.cal_rent()
-                        rent = mult * (d1 + d2)
-
-                        self.money -= rent
-                        owner.money += rent
-
-                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
-                        print(f"{self.name}: You have ${self.money}.\n")
-                    else:
-                        print(f"{owner.name} is in jail. No rent is payed.\n")
+                if owner.name != self.name:     # pay?
+                    self.rent(block)
             else:
-                self.buy(block)   #buy
+                self.buy(block)                 # buy
         
         elif type(block) == Railroad:
             if block.owner != '':
                 owner = block.owner
 
-                if owner.name != self.name: # pay?
-                    if not owner.jail: 
-                        rent = block.cal_rent()
-                        
-                        self.money -= rent
-                        owner.money += rent
-
-                        print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                        print(f"{self.name}: You have ${self.money}\n")
-                    else:
-                        print(f"{owner.name} is in jail. No rent is payed.\n")
+                if owner.name != self.name:     # pay?
+                    self.rent(block)
             else:
-                self.buy(block)   #buy
+                self.buy(block)                 # buy
         
         elif type(block) == Taxes:
             tax = block.price
