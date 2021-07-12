@@ -124,6 +124,7 @@ class Taxes:
         self.location = description['location']
         self.price = description['price']
 
+
 class Player:
     """ A data type representing a monopoly player
         with name, position, money, and other relavant 
@@ -166,7 +167,7 @@ class Player:
         """
         Updates players information when they are sent to jail
         """
-        print(self.name, "going to jail\n")
+        print(self.name, "going to jail.\n")
         
         self.dbl_roll = 0      
         self.jail = True
@@ -193,11 +194,11 @@ class Player:
         block = board[self.position]
 
         if self.jail:                 # Player is in jail right now
-            print(self.name, 'is currently in Jail\n')
+            print(f"{self.name} is currently in Jail.\n")
         elif type(block) != str:      # landed on properties
-            print(self.name, 'landed on', block.name,"\n")
+            print(f"{self.name} landed on {block.name}.\n")
         else:
-            print(self.name, 'landed on', board[self.position],"\n")
+            print(f"{self.name} landed on {board[self.position]}.\n")
 
     def post_jail(self):
         """
@@ -208,7 +209,7 @@ class Player:
         self.jail = False               # Update information
         self.jail_roll = 0
 
-        print(self.name, 'leaving jail \n')
+        print(self.name, 'leaving jail. \n')
 
         d1, d2 = self.dice_roll()       # roll again (this time for moving)
 
@@ -222,27 +223,30 @@ class Player:
 
         Input: block, Land (class)
         """
-        print(f"{self.name}: You have ${self.money}")
+        print(f"{self.name}: You have ${self.money}.")
         decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
 
         while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
-            print(f"\n{self.name}: You have ${self.money}")
+            print(f"\n{self.name}: You have ${self.money}.")
             decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
 
-        if decision.lower() in ['y','yes']:                       # buy
-            self.money -= block.price                           # update information
-            block.owner = self
-            
-            print(f"{self.name} bought {block.name}")
-            print(f"{self.name}: You have ${self.money}\n")
+        if decision.lower() in ['y','yes']:                         # buy
+            if block.price < self.money:                            # Have enough money
+                self.money -= block.price                           # update information
+                block.owner = self
+                
+                if type(block) == Land:
+                    self.land += [block]
+                elif type(block) == Utilities:
+                    self.utilities += [block]
+                elif type(block) == Railroad:
+                    self.railroad += [block]
 
-
-            if type(block) == Land:
-                self.land += [block]
-            elif type(block) == Utilities:
-                self.utilities += [block]
-            elif type(block) == Railroad:
-                self.railroad += [block]
+                print(f"{self.name} bought {block.name}.")
+                print(f"{self.name}: You have ${self.money}.\n")
+            else:                                                   # not enough money                    
+                print(f"{self.name}: You do not have enough money.\n")
+                return
         else:
             print()
 
@@ -257,32 +261,35 @@ class Player:
             print(f"No upgrades avaliable for {block.name}\n")
             return
 
-        print(f"{self.name}: You have ${self.money}")
-        print(f"{block.name} has {block.houses} houses and the current rent is ${block.cal_rent()}")
+        print(f"{self.name}: You have ${self.money}.")
+        print(f"{block.name} has {block.houses} houses and the current rent is ${block.cal_rent()}.")
         if block.houses == 4:
-            print(f"If you upgrade to hotel the rent would be ${block.rent['hotel']}")
+            print(f"If you upgrade to hotel the rent would be ${block.rent['hotel']}.")
         else:
-            print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}")
+            print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}.")
 
 
         decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
-            print(f"\n{self.name}: You have ${self.money}")
+            print(f"\n{self.name}: You have ${self.money}.")
             decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                       # buy
-            block.houses += 1 
+            if block.upgradeCost < self.money:                    # Have enough money
+                block.houses += 1 
 
-            if block.houses == 5:
-                block.houses = 'hotel'
-                print(f"\n{self.name} upgraded {block.name} to a hotel")
+                if block.houses == 5:
+                    block.houses = 'hotel'
+                    print(f"\n{self.name} upgraded {block.name} to a hotel.")
+                else:
+                    print(f"\n{self.name} upgraded {block.name} to {block.houses} houses.")
+
+                self.money -= block.upgradeCost
+
+                print(f"{self.name}: You have ${self.money}.\n")
             else:
-                print(f"\n{self.name} upgraded {block.name} to {block.houses} houses")
-
-            self.money -= block.upgradeCost
-
-            print(f"{self.name}: You have ${self.money}\n")
+                print(f"{self.name}: You do not have enough money. \n")
         else:
             print()
 
@@ -297,6 +304,7 @@ class Player:
             if not (block in owner.mortgage):        # property not under mortgage
                 if type(block) in [Land, Railroad]:     # Land & Railroad have same method of rent calculation
                     rent = block.cal_rent()
+
                 elif type(block) == Utilities:
                     d1, d2 = self.dice_roll()
                     mult = block.cal_rent()
@@ -305,8 +313,8 @@ class Player:
                 self.money -= rent
                 owner.money += rent
 
-                print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}")
-                print(f"{self.name}: You have ${self.money}\n")
+                print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
+                print(f"{self.name}: You have ${self.money}.\n")
             else:                                       # property played under mortgage
                 print(f"{block.name} is under mortgage. No rent is payed. \n")
         else:                                           # owner in jail
@@ -353,8 +361,8 @@ class Player:
             tax = block.price
             self.money -= tax
 
-            print(f"{self.name} payed ${tax} of {block.name}")
-            print(f"{self.name}: You have ${self.money}\n")       
+            print(f"{self.name} payed ${tax} of {block.name}.")
+            print(f"{self.name}: You have ${self.money}.\n")       
 
     def player_turn(self, board):
         """
@@ -368,13 +376,13 @@ class Player:
             self.jail_roll += 1
             
             if self.jail_roll == 3:             # in jail for 3 rounds
-                print(self.name, 'end of third turn in jail')
+                print(self.name, 'end of third turn in jail.')
 
                 self.post_jail()                             
                 self.print_position(board) 
 
             elif d1 == d2:                      # rolled a double
-                print(self.name, 'rolled a double while in jail')
+                print(self.name, 'rolled a double while in jail.')
 
                 self.post_jail()
                 self.print_position(board)
@@ -390,7 +398,7 @@ class Player:
                 self.print_position(board)
 
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
-                    print('Rolled 3 consecutive doubles\n')
+                    print('Rolled 3 consecutive doubles.\n')
                     self.go_to_jail()
                     return                      # end turn
 
