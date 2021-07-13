@@ -239,7 +239,54 @@ class Player:
         print()
         return prop_dict 
 
-                
+    def mortgage_prop(self, owe):
+        """
+        Prompts the user to mortgage their property and adds the money they get from
+        the mortgage to their money. Keeps prompting the user to sell houses/mortgage 
+        properties until thier money is more than the amout they owe
+
+        Input: owe, int, the amount that they have to pay
+        """
+        prop_dict = self.print_properties()
+
+        while self.money < owe:
+            print(f"{self.name}: You have ${self.money}. You owe ${owe}")
+            prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
+            prop_name = prop_name.lower()
+
+            while prop_name not in prop_dict or prop_dict[prop_name].mortgage:  # Make sure that they give a valid property
+                prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
+                prop_name = prop_name.lower()
+
+            prop = prop_dict[prop_name]
+            if type(prop) == Land:                                # see if they have houses to sell
+                houses = prop.houses
+                house_val = prop.upgradeCost/2
+                if houses != 0:                                   # They have houses they must sell first
+                    if houses == 'hotel':
+                        print(f"\n{self.name}: You have a hotel (5 houses) on {prop.name}. Value: {house_val}")
+                        houses = 5                                # change to 5 so that it's easier to work with later
+                    else:
+                        print(f"\n{self.name}: You have {houses} houses on {prop.name}. Value: {house_val}")
+
+                    n = 6                                         # place holder
+                    while n > houses:
+                        try:                                      # Check for valid input
+                            n = int(input(f"{self.name}: How many houses on {prop.name} do you want to sell? "))
+                            
+                        except ValueError:              
+                            print("Sorry, please try again")
+                    print()
+                    self.money += house_val * n                  # Update information
+                    prop.houses = houses - n
+                    continue                                     # Go back to the beginig of the while loop
+
+            mortgage_val = prop.mortgage_val                     # mortgaging property
+            self.mortgage += [prop]
+            prop.mortgage = True
+            self.money += mortgage_val
+            prop_dict.pop(prop_name, None)                       # None is the type to specifiy as if they can't find the key
+              
     def buy(self, block):
         """
         Prompts the user and askes if they want to buy the block they 
@@ -550,7 +597,10 @@ def game(f_layout=layout, f_json=description):
 if True:
     b = create_board(layout, description)
     p1 = Player('Hi')
-    p1.land = [b[1], b[13], b[39]]
+    p1.land = [b[1], b[9], b[13], b[39]]
+    b[1].houses = 'hotel'
+    b[9].houses = 2
+    p1.money = 10
     p1.utilities = [b[12]]
     p1.railroad = [b[5], b[25]]
-    p1.print_properties()
+    p1.mortgage_prop(500)
