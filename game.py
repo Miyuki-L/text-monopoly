@@ -23,7 +23,8 @@ class Land:
         self.price = description['price']
         self.upgradeCost = description['upgradeCost']
         self.rent = description['rent']
-        self.mortgage = description['mortgage']
+        self.mortgage_val = description['mortgage']
+        self.mortgage = False
         self.colorSet = description['colorSet']
         self.houses = 0
         self.owner = ''             #no one owns this property yet
@@ -58,7 +59,8 @@ class Railroad:
         self.location = description['location']
         self.price = description['price']
         self.rent = description['rent']
-        self.mortgage = description['mortgage']
+        self.mortgage_val = description['mortgage']
+        self.mortgage = False
         self.owner = ''             #Class Player
 
     def cal_rent(self):
@@ -91,7 +93,8 @@ class Utilities:
         self.location = description['location']
         self.price = description['price']
         self.rent = description['rent']
-        self.mortgage = description['mortgage']
+        self.mortgage_val = description['mortgage']
+        self.mortgage = False
         self.owner = ''             #no one owns this property yet
 
     def cal_rent(self):
@@ -215,6 +218,28 @@ class Player:
 
         self.move(d1, d2)               
 
+    def print_properties(self):
+        """
+        Prints all of the properties the Player owns and the Mortgage/House values of those properties
+        Return prop_dict, dictionary of prop.name to property 
+        """
+        prop_dict = {}
+        # Printing Property Names
+        for prop_list in [self.land, self.railroad, self.utilities]:
+            for prop in prop_list:
+                if not prop.mortgage:                       # Not already mortgaged.
+                    if type(prop) == Land:                      
+                        print(f"{prop.name : <25} Mortgage Value: ${prop.mortgage_val: 4}  Houses: {prop.houses : <5} House value: ${((prop.upgradeCost)//2) : >4}")
+                    else:
+                        print(f"{prop.name : <25} Mortgage Value: ${prop.mortgage_val : 4}")
+
+                    name = prop.name.lower()                       # have more flexibility with user input
+                    prop_dict[name] = prop                         # Name: prop dict for easy access later
+
+        print()
+        return prop_dict 
+
+                
     def buy(self, block):
         """
         Prompts the user and askes if they want to buy the block they 
@@ -231,7 +256,7 @@ class Player:
             decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                         # buy
-            if block.price < self.money:                            # Have enough money
+            if block.price <= self.money:                            # Have enough money
                 self.money -= block.price                           # update information
                 block.owner = self
                 
@@ -276,7 +301,7 @@ class Player:
             decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         if decision.lower() in ['y','yes']:                       # buy
-            if block.upgradeCost < self.money:                    # Have enough money
+            if block.upgradeCost <= self.money:                    # Have enough money
                 block.houses += 1 
 
                 if block.houses == 5:
@@ -301,7 +326,7 @@ class Player:
         owner = block.owner
 
         if not owner.jail:                
-            if not (block in owner.mortgage):        # property not under mortgage
+            if not block.mortgage:           # property not under mortgage
                 if type(block) in [Land, Railroad]:     # Land & Railroad have same method of rent calculation
                     rent = block.cal_rent()
 
@@ -310,7 +335,10 @@ class Player:
                     mult = block.cal_rent()
                     rent = mult * (d1 + d2)
 
-                self.money -= rent
+                if self.money < rent:                # Call Mortgaging functions
+                    self.mortgage_prop(rent)
+
+                self.money -= rent                      # Collect Rent 
                 owner.money += rent
 
                 print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
@@ -359,6 +387,10 @@ class Player:
         
         elif type(block) == Taxes:
             tax = block.price
+
+            if self.money < tax:                # Call Mortgaging functions
+                self.mortgage_prop(tax)
+
             self.money -= tax
 
             print(f"{self.name} payed ${tax} of {block.name}.")
@@ -515,5 +547,10 @@ def game(f_layout=layout, f_json=description):
         if p_index == len(players):                 # reset p_index
             p_index = 0 
 
-
-            
+if True:
+    b = create_board(layout, description)
+    p1 = Player('Hi')
+    p1.land = [b[1], b[13], b[39]]
+    p1.utilities = [b[12]]
+    p1.railroad = [b[5], b[25]]
+    p1.print_properties()
