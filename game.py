@@ -152,7 +152,7 @@ class Player:
         self.utilities = []
 
         self.bankrupt = False
-        self.mortgage = []
+
 
     def dice_roll(self):
         """
@@ -289,7 +289,6 @@ class Player:
             
             print()
             mortgage_val = prop.mortgage_val                     # mortgaging property
-            self.mortgage += [prop]
             prop.mortgage = True
             self.money += mortgage_val
             # prop_dict.pop(prop_name, None)                       # None is the type to specifiy as if they can't find the key
@@ -604,20 +603,36 @@ def game(f_layout=layout, f_json=description):
     p_index = 0
     while True:
         current_p = players[p_index]
-        current_p.player_turn(board)
-        sleep(1)
+        if not current_p.bankrupt:
+            current_p.player_turn(board)
+            sleep(1)
 
-        p_index += 1                                # next player
-        if p_index == len(players):                 # reset p_index
-            p_index = 0 
+            p_index += 1                                # next player
+            if p_index == len(players):                 # reset p_index
+                p_index = 0 
 
-if True:
+        if len(players) == 1:                           # treat 1 player game differently
+            player = players[0]
+            if player.bankrupt:
+                print(f'Game Over!!!\n')
+                return player
+        else:
+            bankrupts = [player.bankrupt for player in players]
+            if sum(bankrupts) == (len(players) - 1):                        # all but 1 player is bankrupt
+                win_index = bankrupts.index(0)                   # Find index corresponding to winner
+                winner = players[win_index]
+                print(f'Game Over!!!\n {winner.name} wins the game. \n Congradulations {winner.name}')
+                return winner
+
+if False:
     b = create_board(layout, description)
     p1 = Player('Hi')
-    # p1.land = [b[1], b[9], b[39]]
-    # b[1].houses = 'hotel'
+    p2 = Player('Bye')
+    p2.land = [b[39]]
+    b[39].houses = 'hotel'
+    b[39].owner = p2
     # b[9].houses = 2
     p1.money = 10
     p1.utilities = [b[12]]
     # p1.railroad = [b[5]]
-    p1.player_turn
+    p1.check_block(b[39])
