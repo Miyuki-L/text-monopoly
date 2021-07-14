@@ -225,6 +225,7 @@ class Player:
         """
         prop_dict = {}
         # Printing Property Names
+        print(f"{self.name}'s properties:")
         for prop_list in [self.land, self.railroad, self.utilities]:
             for prop in prop_list:
                 if not prop.mortgage:                       # Not already mortgaged.
@@ -247,9 +248,14 @@ class Player:
 
         Input: owe, int, the amount that they have to pay
         """
-        prop_dict = self.print_properties()
-
         while self.money < owe:
+            prop_dict = self.print_properties()
+
+            if len(prop_dict) == 0:                               # no more properties to mortgage
+                print(f"{self.name}: You are bankrupt. Game ends for {self.name}.\n")
+                self.bankrupt = True
+                return
+
             print(f"{self.name}: You have ${self.money}. You owe ${owe}")
             prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
             prop_name = prop_name.lower()
@@ -280,12 +286,13 @@ class Player:
                     self.money += house_val * n                  # Update information
                     prop.houses = houses - n
                     continue                                     # Go back to the beginig of the while loop
-
+            
+            print()
             mortgage_val = prop.mortgage_val                     # mortgaging property
             self.mortgage += [prop]
             prop.mortgage = True
             self.money += mortgage_val
-            prop_dict.pop(prop_name, None)                       # None is the type to specifiy as if they can't find the key
+            # prop_dict.pop(prop_name, None)                       # None is the type to specifiy as if they can't find the key
               
     def buy(self, block):
         """
@@ -384,6 +391,8 @@ class Player:
 
                 if self.money < rent:                # Call Mortgaging functions
                     self.mortgage_prop(rent)
+                    if self.bankrupt:
+                        return
 
                 self.money -= rent                      # Collect Rent 
                 owner.money += rent
@@ -437,6 +446,8 @@ class Player:
 
             if self.money < tax:                # Call Mortgaging functions
                 self.mortgage_prop(tax)
+                if self.bankrupt:               # end call if bankrupt
+                    return
 
             self.money -= tax
 
@@ -487,7 +498,11 @@ class Player:
 
                 else:                           # check block & roll again
                     self.check_block(board[self.position])  # Looks at the checks if they could buy or have to pay
-                    d1, d2 = self.dice_roll()
+
+                    if self.bankrupt:
+                        return
+                    else:
+                        d1, d2 = self.dice_roll()
 
             
             self.move(d1, d2)           # update information
@@ -500,6 +515,8 @@ class Player:
                 return                     # end turn
 
             self.check_block(board[self.position])
+            if self.bankrupt:
+                return
          
 
 def read_json(filename):
@@ -597,10 +614,10 @@ def game(f_layout=layout, f_json=description):
 if True:
     b = create_board(layout, description)
     p1 = Player('Hi')
-    p1.land = [b[1], b[9], b[13], b[39]]
-    b[1].houses = 'hotel'
-    b[9].houses = 2
+    # p1.land = [b[1], b[9], b[39]]
+    # b[1].houses = 'hotel'
+    # b[9].houses = 2
     p1.money = 10
     p1.utilities = [b[12]]
-    p1.railroad = [b[5], b[25]]
-    p1.mortgage_prop(500)
+    # p1.railroad = [b[5]]
+    p1.player_turn
