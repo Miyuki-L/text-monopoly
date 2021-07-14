@@ -336,7 +336,11 @@ class Player:
         Input: block, class Land
         """
         if block.houses == 'hotel':
-            print(f"No upgrades avaliable for {block.name}\n")
+            print(f"{self.name}: No upgrades avaliable for {block.name}\n")
+            return
+
+        if block.mortgage:
+            print(f"{self.name}: {block.name} is under mortgage. No upgrades avaliable.\n")
             return
 
         print(f"{self.name}: You have ${self.money}.")
@@ -624,15 +628,16 @@ def game(f_layout=layout, f_json=description):
                 print(f'Game Over!!!\n {winner.name} wins the game. \n Congradulations {winner.name}')
                 return winner
 
-if False:
+if True:
     b = create_board(layout, description)
     p1 = Player('Hi')
     p2 = Player('Bye')
     p2.land = [b[39]]
-    b[39].houses = 'hotel'
+    b[39].houses = 4
     b[39].owner = p2
-    # b[9].houses = 2
+    b[39].mortgage = True
     p1.money = 10
     p1.utilities = [b[12]]
     # p1.railroad = [b[5]]
-    p1.check_block(b[39])
+    # p1.check_block(b[39])
+    p2.upgrade(b[39])
