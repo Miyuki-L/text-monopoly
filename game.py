@@ -27,12 +27,12 @@ class AI:
             output: str: the decision made for that specific prompt.
         """
         if prompt == 'buy':
-            r = random.uniform()#random num 0-1
+            r = random.uniform(0,1)#random num 0-1
             if r < self.bc:
                 return 'y'
             return 'n'
         elif prompt == 'upgrade':
-            r = random.uniform()#random num 0-1
+            r = random.uniform(0,1)#random num 0-1
             if r < self.uc:
                 return 'y'
             return 'n'
@@ -275,6 +275,25 @@ class Player:
         print()
         return prop_dict 
 
+    def make_decision(self, question, prompt_type):
+        """ determines based on how is the operator of the player, 
+        whether to prompt human for an answer or to have the ai make the decision
+        Input: question: the question that is being asked, f string
+            prompt_type: the type/purpose of the question, str e.g. buy
+        """
+
+        if self.operator == 'human':
+            decision = input(question)
+            if prompt_type in ['buy', 'upgrade']:                       # buy and upgrade have the same type of decision
+                while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
+                    print(f"\n{self.name}: You have ${self.money}.")
+                    decision = input(question)
+        else:
+            ai = self.ai
+            decision = ai.answer(prompt_type)
+            print(question,decision)
+
+        return decision
 
     def mortgage_prop(self, owe):
         """
@@ -627,7 +646,6 @@ def create_players():
 
     for i in range(n):
         name = input("What is the player name? ")
-        print()
         p= Player(name)
 
         op = input("Who is operating the player? [human/ai] ")                      # Asks who is operating the game
@@ -635,17 +653,25 @@ def create_players():
         while op not in ['human', 'ai']:
             op = input("Who is operating the player? [human/ai] ")
             op = op.lower()
-            print()
-
+            
         if op == 'ai':
-            bc = float(input("What is the player's buying channce? [0-1] "))
-            uc = float(input("What is the player's upgrading channce? [0-1] "))
+            while True:
+                try:
+                    bc = float(input("What is the player's buying channce? [0-1] "))
+                    uc = float(input("What is the player's upgrading channce? [0-1] "))
+                    print()
+                except ValueError:              #checks if an int was inputted
+                    print("Sorry, please try again\n")
+                    continue
+                else:
+                    break
+
             p.ai = AI(bc, uc)
             p.operator = op
         else:
             p.operator = op
 
-
+        print()
         players += [p]
 
     return players
@@ -665,7 +691,7 @@ def game(f_layout=layout, f_json=description):
         current_p = players[p_index]
         if not current_p.bankrupt:
             current_p.player_turn(board)
-            sleep(1)
+            sleep(2)
 
             p_index += 1                                # next player
             if p_index == len(players):                 # reset p_index
@@ -684,7 +710,7 @@ def game(f_layout=layout, f_json=description):
                 print(f'Game Over!!!\n {winner.name} wins the game. \n Congradulations {winner.name}')
                 return winner
 
-if True:
+if False:
     b = create_board(layout, description)
     p1 = Player('Hi')
     p2 = Player('Bye')
@@ -698,3 +724,12 @@ if True:
     # p1.check_block(b[39])
     # p2.upgrade(b[39])
     p1.buy(b[1])
+
+if True:       #testing  simulator
+    players = create_players()
+    b = create_board(layout, description)   
+
+    block = b[39]
+
+    for player in players:
+        player.make_decision(f"{player.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ", 'upgrade')
