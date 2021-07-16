@@ -5,6 +5,16 @@ from time import sleep
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
 description = "properties_tax.json" # file containing information aobut land, utilities, tax
 
+def cprint(player, message):
+    """
+    A print statement that prints the message in the color give to the player
+    Adds color to the terminal version of the monopoly game
+
+    input:  player: object of Class Player 
+            message: str, the message to print 
+    """
+    print(f"\033[{player.color}m {message} \033[m")
+
 class AI:
     """ simulator/ai that makes the decisions  that players would make in monopoly.
     different methods in this class represents different playing styles of a player
@@ -188,6 +198,8 @@ class Player:
 
         self.operator = ""                  #who is playing the game human or ai 
         self.ai = None
+        
+        self.color = None                                   # terminal printing color
 
     def dice_roll(self):
         """
@@ -197,7 +209,7 @@ class Player:
         d1 = random.choice(range(1,7))
         d2 = random.choice(range(1,7))
         
-        print(self.name, 'rolled:', d1, d2)
+        cprint(self.name, 'rolled:', d1, d2)
         
         return d1,d2
 
@@ -205,7 +217,7 @@ class Player:
         """
         Updates players information when they are sent to jail
         """
-        print(self.name, "going to jail.\n")
+        cprint(self.name, "going to jail.\n")
         
         self.dbl_roll = 0      
         self.jail = True
@@ -221,7 +233,7 @@ class Player:
 
         if self.position >= 40:
             self.position -= 40
-            print(f"{self.name} passed Go and collected $200.")
+            cprint(f"{self.name} passed Go and collected $200.")
             self.money += 200
    
     def print_position(self,board):
@@ -232,11 +244,11 @@ class Player:
         block = board[self.position]
 
         if self.jail:                 # Player is in jail right now
-            print(f"{self.name} is currently in Jail.\n")
+            cprint(f"{self.name} is currently in Jail.\n")
         elif type(block) != str:      # landed on properties
-            print(f"{self.name} landed on {block.name}.\n")
+            cprint(f"{self.name} landed on {block.name}.\n")
         else:
-            print(f"{self.name} landed on {board[self.position]}.\n")
+            cprint(f"{self.name} landed on {board[self.position]}.\n")
 
     def post_jail(self):
         """
@@ -247,7 +259,7 @@ class Player:
         self.jail = False               # Update information
         self.jail_roll = 0
 
-        print(self.name, 'leaving jail. \n')
+        cprint(self.name, 'leaving jail. \n')
 
         d1, d2 = self.dice_roll()       # roll again (this time for moving)
 
@@ -307,11 +319,11 @@ class Player:
             prop_dict = self.print_properties()
 
             if len(prop_dict) == 0:                               # no more properties to mortgage
-                print(f"{self.name}: You are bankrupt. Game ends for {self.name}.\n")
+                cprint(f"{self.name}: You are bankrupt. Game ends for {self.name}.\n")
                 self.bankrupt = True
                 return
 
-            print(f"{self.name}: You have ${self.money}. You owe ${owe}")
+            cprint(f"{self.name}: You have ${self.money}. You owe ${owe}")
             prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
             prop_name = prop_name.lower()
 
@@ -640,13 +652,17 @@ def create_players():
             print("Sorry, please try again")
             continue
         else:
-            break
+            if n <= 8:                  # limit to 8 players
+                break
 
     players = []
+    cCodes = [31,32,33,34,35,36,37,90]
 
     for i in range(n):
         name = input("What is the player name? ")
         p= Player(name)
+
+        p.color = cCodes[i]
 
         op = input("Who is operating the player? [human/ai] ")                      # Asks who is operating the game
         op = op.lower()
@@ -674,6 +690,7 @@ def create_players():
         print()
         players += [p]
 
+    
     return players
 
 def game(f_layout=layout, f_json=description):
@@ -725,7 +742,7 @@ if False:
     # p2.upgrade(b[39])
     p1.buy(b[1])
 
-if True:       #testing  simulator
+if False:       #testing  simulator
     players = create_players()
     b = create_board(layout, description)   
 
@@ -733,3 +750,11 @@ if True:       #testing  simulator
 
     for player in players:
         player.make_decision(f"{player.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ", 'upgrade')
+    p2.upgrade(b[39])
+
+
+if True:
+    cCodes = [31,32,33,34,35,36,37,90]
+    message = 'hi'
+    for color in cCodes:
+        print(f"\033[{color}m {message} \033[m")
