@@ -431,7 +431,7 @@ class Player:
             print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}.")
 
         self.cprint(f"{self.name}: You have ${self.money}.")
-        
+
         # decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         # while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
@@ -670,7 +670,7 @@ def create_players():
                 break
 
     players = []
-    cCodes = [31,32,33,34,35,36,37,90]
+    cCodes = [91,92,93,94,95,96,97,90]
 
     for i in range(n):
         name = input("What is the player name? ")
