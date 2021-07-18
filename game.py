@@ -5,16 +5,6 @@ from time import sleep
 layout = 'board_layout.txt'  # the text file with the name of each block on the board
 description = "properties_tax.json" # file containing information aobut land, utilities, tax
 
-def cprint(player, message):
-    """
-    A print statement that prints the message in the color give to the player
-    Adds color to the terminal version of the monopoly game
-
-    input:  player: object of Class Player 
-            message: str, the message to print 
-    """
-    print(f"\033[{player.color}m {message} \033[m")
-
 class AI:
     """ simulator/ai that makes the decisions  that players would make in monopoly.
     different methods in this class represents different playing styles of a player
@@ -201,6 +191,29 @@ class Player:
         
         self.color = None                                   # terminal printing color
 
+    def cprint(self, message):
+        """
+        A print statement that prints the message in the color give to the player
+        Adds color to the terminal version of the monopoly game
+
+        input:  player: object of Class Player 
+                message: str, the message to print 
+        """
+        print(f"\033[{self.color}m{message} \033[m")
+
+    def cinput(self, question):
+        """
+        Same as the default python input() function but prints the messeage in the 
+        color assciated with the player 
+
+        input: question: str, the question to print
+        """
+
+        print(f"\033[{self.color}m{question} \033[m", end='')
+        decision = input()
+
+        return decision
+
     def dice_roll(self):
         """
         Rolls dice and returns the value of the two dices 
@@ -209,7 +222,7 @@ class Player:
         d1 = random.choice(range(1,7))
         d2 = random.choice(range(1,7))
         
-        cprint(self.name, 'rolled:', d1, d2)
+        print(f"{self.name} rolled: {d1} {d2}")
         
         return d1,d2
 
@@ -217,7 +230,7 @@ class Player:
         """
         Updates players information when they are sent to jail
         """
-        cprint(self.name, "going to jail.\n")
+        print(f"{self.name} going to jail.\n")
         
         self.dbl_roll = 0      
         self.jail = True
@@ -233,9 +246,10 @@ class Player:
 
         if self.position >= 40:
             self.position -= 40
-            cprint(f"{self.name} passed Go and collected $200.")
             self.money += 200
-   
+
+            print(f"{self.name} passed Go and collected $200.")
+            
     def print_position(self,board):
         """
         Prints the block that landed on or is currently at 
@@ -244,11 +258,11 @@ class Player:
         block = board[self.position]
 
         if self.jail:                 # Player is in jail right now
-            cprint(f"{self.name} is currently in Jail.\n")
+            print(f"{self.name} is currently in Jail.\n")
         elif type(block) != str:      # landed on properties
-            cprint(f"{self.name} landed on {block.name}.\n")
+            print(f"{self.name} landed on {block.name}.\n")
         else:
-            cprint(f"{self.name} landed on {board[self.position]}.\n")
+            print(f"{self.name} landed on {board[self.position]}.\n")
 
     def post_jail(self):
         """
@@ -259,7 +273,7 @@ class Player:
         self.jail = False               # Update information
         self.jail_roll = 0
 
-        cprint(self.name, 'leaving jail. \n')
+        print(f"{self.name} leaving jail. \n")
 
         d1, d2 = self.dice_roll()       # roll again (this time for moving)
 
@@ -295,15 +309,15 @@ class Player:
         """
 
         if self.operator == 'human':
-            decision = input(question)
+            decision = self.cinput(question)
             if prompt_type in ['buy', 'upgrade']:                       # buy and upgrade have the same type of decision
                 while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
-                    print(f"\n{self.name}: You have ${self.money}.")
-                    decision = input(question)
+                    self.cprint(f"\n{self.name}: You have ${self.money}.")
+                    decision = self.cinput(question)
         else:
             ai = self.ai
             decision = ai.answer(prompt_type)
-            print(question,decision)
+            self.cprint(f"{question} {decision}")
 
         return decision
 
@@ -319,16 +333,16 @@ class Player:
             prop_dict = self.print_properties()
 
             if len(prop_dict) == 0:                               # no more properties to mortgage
-                cprint(f"{self.name}: You are bankrupt. Game ends for {self.name}.\n")
+                self.cprint(f"{self.name}: You are bankrupt. Game ends for {self.name}.\n")
                 self.bankrupt = True
                 return
 
-            cprint(f"{self.name}: You have ${self.money}. You owe ${owe}")
-            prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
+            self.cprint(f"{self.name}: You have ${self.money}. You owe ${owe}")
+            prop_name = self.cinput(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
             prop_name = prop_name.lower()
 
             while prop_name not in prop_dict or prop_dict[prop_name].mortgage:  # Make sure that they give a valid property
-                prop_name = input(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
+                prop_name = self.cinput(f"{self.name}: Which property to you want to sell a house on or mortgage? ")
                 prop_name = prop_name.lower()
 
             prop = prop_dict[prop_name]
@@ -337,15 +351,15 @@ class Player:
                 house_val = prop.upgradeCost/2
                 if houses != 0:                                   # They have houses they must sell first
                     if houses == 'hotel':
-                        print(f"\n{self.name}: You have a hotel (5 houses) on {prop.name}. Value: {house_val}")
+                        self.cprint(f"\n{self.name}: You have a hotel (5 houses) on {prop.name}. Value: {house_val}")
                         houses = 5                                # change to 5 so that it's easier to work with later
                     else:
-                        print(f"\n{self.name}: You have {houses} houses on {prop.name}. Value: {house_val}")
+                        self.cprint(f"\n{self.name}: You have {houses} houses on {prop.name}. Value: {house_val}")
 
                     n = 6                                         # place holder
                     while n > houses:
                         try:                                      # Check for valid input
-                            n = int(input(f"{self.name}: How many houses on {prop.name} do you want to sell? "))
+                            n = int(self.cinput(f"{self.name}: How many houses on {prop.name} do you want to sell? "))
                             
                         except ValueError:              
                             print("Sorry, please try again")
@@ -368,7 +382,7 @@ class Player:
 
         Input: block, Land (class)
         """
-        print(f"{self.name}: You have ${self.money}.")
+        self.cprint(f"{self.name}: You have ${self.money}.")
         # decision = input(f"{self.name}: Do you want to buy {block.name} (Price:{block.price})? [y/n] ")
         # while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
         #     print(f"\n{self.name}: You have ${self.money}.")
@@ -387,10 +401,10 @@ class Player:
                 elif type(block) == Railroad:
                     self.railroad += [block]
 
-                print(f"{self.name} bought {block.name}.")
-                print(f"{self.name}: You have ${self.money}.\n")
+                self.cprint(f"{self.name} bought {block.name}.")
+                self.cprint(f"{self.name}: You have ${self.money}.\n")
             else:                                                   # not enough money                    
-                print(f"{self.name}: You do not have enough money.\n")
+                self.cprint(f"{self.name}: You do not have enough money.\n")
                 return
         else:
             print()
@@ -403,21 +417,21 @@ class Player:
         Input: block, class Land
         """
         if block.houses == 'hotel':
-            print(f"{self.name}: No upgrades avaliable for {block.name}\n")
+            self.cprint(f"{self.name}: No upgrades avaliable for {block.name}\n")
             return
 
         if block.mortgage:
-            print(f"{self.name}: {block.name} is under mortgage. No upgrades avaliable.\n")
+            self.cprint(f"{self.name}: {block.name} is under mortgage. No upgrades avaliable.\n")
             return
 
-        print(f"{self.name}: You have ${self.money}.")
         print(f"{block.name} has {block.houses} houses and the current rent is ${block.cal_rent()}.")
         if block.houses == 4:
             print(f"If you upgrade to hotel the rent would be ${block.rent['hotel']}.")
         else:
             print(f"If you upgrade to {block.houses+1} houses the rent would be {block.rent[str(block.houses+1)]}.")
 
-
+        self.cprint(f"{self.name}: You have ${self.money}.")
+        
         # decision = input(f"{self.name}: Do you want to upgrade {block.name} (Cost:{block.upgradeCost})? [y/n] ")
 
         # while decision.lower() not in ['y', 'n', 'yes', 'no']:  # valid input?
@@ -432,15 +446,15 @@ class Player:
 
                 if block.houses == 5:
                     block.houses = 'hotel'
-                    print(f"\n{self.name} upgraded {block.name} to a hotel.")
+                    self.cprint(f"\n{self.name} upgraded {block.name} to a hotel.")
                 else:
-                    print(f"\n{self.name} upgraded {block.name} to {block.houses} houses.")
+                    self.cprint(f"\n{self.name} upgraded {block.name} to {block.houses} houses.")
 
                 self.money -= block.upgradeCost
 
-                print(f"{self.name}: You have ${self.money}.\n")
+                self.cprint(f"{self.name}: You have ${self.money}.\n")
             else:
-                print(f"{self.name}: You do not have enough money. \n")
+                self.cprint(f"{self.name}: You do not have enough money. \n")
         else:
             print()
 
@@ -469,8 +483,8 @@ class Player:
                 self.money -= rent                      # Collect Rent 
                 owner.money += rent
 
-                print(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
-                print(f"{self.name}: You have ${self.money}.\n")
+                self.cprint(f"{self.name} payed {owner.name} ${rent} for landing on {block.name}.")
+                self.cprint(f"{self.name}: You have ${self.money}.\n")
             else:                                       # property played under mortgage
                 print(f"{block.name} is under mortgage. No rent is payed. \n")
         else:                                           # owner in jail
@@ -523,8 +537,8 @@ class Player:
 
             self.money -= tax
 
-            print(f"{self.name} payed ${tax} of {block.name}.")
-            print(f"{self.name}: You have ${self.money}.\n")       
+            self.cprint(f"{self.name} payed ${tax} of {block.name}.")
+            self.cprint(f"{self.name}: You have ${self.money}.\n")       
 
     def player_turn(self, board):
         """
@@ -538,13 +552,13 @@ class Player:
             self.jail_roll += 1
             
             if self.jail_roll == 3:             # in jail for 3 rounds
-                print(self.name, 'end of third turn in jail.')
+                print(f'{self.name} end of third turn in jail.')
 
                 self.post_jail()                             
                 self.print_position(board) 
 
             elif d1 == d2:                      # rolled a double
-                print(self.name, 'rolled a double while in jail.')
+                print(f'{self.name} rolled a double while in jail.')
 
                 self.post_jail()
                 self.print_position(board)
@@ -560,7 +574,7 @@ class Player:
                 self.print_position(board)
 
                 if self.dbl_roll == 3:          # Go to jail for 3 consecutive dbls
-                    print('Rolled 3 consecutive doubles.\n')
+                    print(f'{self.name} rolled 3 consecutive doubles.\n')
                     self.go_to_jail()
                     return                      # end turn
 
@@ -754,7 +768,4 @@ if False:       #testing  simulator
 
 
 if True:
-    cCodes = [31,32,33,34,35,36,37,90]
-    message = 'hi'
-    for color in cCodes:
-        print(f"\033[{color}m {message} \033[m")
+    win = game()
