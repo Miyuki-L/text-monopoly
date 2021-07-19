@@ -290,7 +290,7 @@ class Player:
         for prop_list in [self.land, self.railroad, self.utilities]:
             for prop in prop_list:
                 if not prop.mortgage:                       # Not already mortgaged.
-                    if type(prop) == Land:                      
+                    if type(prop) == Land and prop.houses != 0:                      
                         print(f"{prop.name : <25} Mortgage Value: ${prop.mortgage_val: 4}  Houses: {prop.houses : <5} House value: ${((prop.upgradeCost)//2) : >4}")
                     else:
                         print(f"{prop.name : <25} Mortgage Value: ${prop.mortgage_val : 4}")
